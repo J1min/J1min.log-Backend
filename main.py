@@ -1,10 +1,12 @@
-from fastapi import FastAPI
-from sqlalchemy.orm import Session
-
-from typing import List
-from starlette.responses import RedirectResponse
+from fastapi import FastAPI, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.params import Depends
+from sqlalchemy.orm import Session
+from fastapi.responses import FileResponse
+
+import os
+import uuid
+import json
 
 import models, schemas
 from database import SessionLocal, engine
@@ -43,41 +45,24 @@ def main(user_id: int, db: Session = Depends(get_db)):
     )
 
 
-# @app.get("/users/", response_model=List[schemas.User])
-# def show_users(db: Session = Depends(get_db)):
-#     users = db.query(models.User).all()
-#     return users
+@app.post("/photo")  # 사진 post
+async def upload_photo(file: UploadFile, db: Session = Depends(get_db)):
+    UPLOAD_DIR = "./photo"
+    content = await file.read()
+    href = f"{str(uuid.uuid4())}.jpg"  # uuid로 유니크한 파일명으로 변경
+    with open(os.path.join(UPLOAD_DIR, href), "wb") as fp:
+        fp.write(content)  # 서버 로컬에 이미지 저장 (쓰기)
+        photoData = models.photos(photo_id=4, href=href, board_id=1)
+        db.add(photoData)
+        db.commit()
+        db.refresh(photoData)
+    return photoData
 
 
-# @app.post("/users/", response_model=schemas.User)
-# def create_users(enter: schemas.User, db: Session = Depends(get_db)):
-#     user = models.User(
-#         username=enter.username,
-#         fullname=enter.fullname,
-#         role=enter.role,
-#         state=enter.state,
-#     )
-#     db.add(user)
-#     db.commit()
-#     db.refresh(user)
-#     return user
-
-
-# @app.put("/users/{user_id}", response_model=schemas.User)
-# def update_users(
-#     user_id: int, enter: schemas.UserUpdate, db: Session = Depends(get_db)
-# ):
-#     user = db.query(models.User).filter_by(id=user_id).first()
-#     user.fullname = enter.fullname
-#     db.commit()
-#     db.refresh(user)
-#     return user
-
-
-# @app.delete("/users/{user_id}", response_model=schemas.response)
-# def delete_users(user_id: int, db: Session = Depends(get_db)):
-#     user = db.query(models.User).filter_by(id=user_id).first()
-#     db.delete(user)
-#     db.commit()
-#     response = schemas.response(message="Successfully removed!")
-#     return response
+@app.get("/get/photo/{photo_id}")  # 사진의 PK를 입력하면 해당 사진 return
+async def download_photo(photo_id: int, db: Session = Depends(get_db)):
+    UPLOAD_DIR = "./photo/"  # 사진 폴더 안에 저장
+    find_photo = (
+        db.query(models.photos).filter(models.photos.photo_id == photo_id).first()
+    )
+    return FileResponse(UPLOAD_DIR + find_photo.href)

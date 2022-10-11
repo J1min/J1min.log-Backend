@@ -2,17 +2,16 @@ from sqlalchemy import Column, String, DateTime, Integer
 from typing import Optional
 from pydantic import BaseModel
 
+import datetime
 
-# "board"
 # "comments"
 # "contact"
-# "prizes"
+# "certificate"
 # "careers"
 # "leads"
-# "projects"
-# "certificate"
 # "skills"
-
+# "prizes"
+# "projects"
 
 
 class info(BaseModel):
@@ -20,6 +19,26 @@ class info(BaseModel):
     nickname = str
     blog = str
     github = str
+
+    class Config:
+        orm_mode = True
+
+
+class board(BaseModel):
+    board_id = int
+    content = str
+    created_at = datetime.datetime
+    board_nickname = str
+    user_id = int
+
+    class Config:
+        orm_mode = True
+
+
+class photos(BaseModel):
+    photo_id = int
+    href = str
+    board_id = int
 
     class Config:
         orm_mode = True
