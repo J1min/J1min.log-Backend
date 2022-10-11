@@ -1,2 +1,2 @@
 # J1min.log-Backend
-## FastAPi, Mysql 기반 
+## FastAPI, Mysql 기반 블로그 + 레주메 서비스
