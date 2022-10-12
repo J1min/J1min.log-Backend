@@ -13,7 +13,7 @@ class info(BaseModel):
         orm_mode: True
 
 
-class write(BaseModel):
+class board(BaseModel):
     user_id: int
     created_at: str
     content: str
