@@ -109,4 +109,14 @@ class photos(BaseModel):
     board_id: int
 
     class Config:
-        orm_mode: True
+        orm_mode = True
+
+
+class script(BaseModel):
+    script_id = int
+    script_content = str
+    author = str
+
+    class Config:
+        orm_mode = True
+
