@@ -2,3 +2,4 @@
 database.sql
 secret.json
 /photo
+/__pycache__
