@@ -35,6 +35,12 @@ def get_db():
         db.close()
 
 
+def post_db(db, data):
+    db.add(data)
+    db.commit()
+    db.refresh(data)
+
+
 @app.get("/user/{user_id}")  # 특정 유저 조회
 def get_user(user_id: int, db: Session = Depends(get_db)):
     users = db.query(models.info).filter(models.info.user_id == user_id).first()
@@ -51,21 +57,24 @@ def get_board(board_id: int, db: Session = Depends(get_db)):
     return (
         {"response": "게시글이 없는데요"}
         if board == None
-        else {"response": "게시글이 있어요", "BoardData": board}
+        else {"response": "게시글이 있어요", "boardData": board}
     )
 
 
-@app.get("/script/all")  
+@app.get("/script/all")
 def get_all_script(db: Session = Depends(get_db)):
     script = db.query(models.script).all()
     return script
 
 
-@app.get("/script/random")  
+@app.get("/script/random")
 def get_all_script(db: Session = Depends(get_db)):
     script = db.query(models.script).all()
-    randomNumber = random.randint(0, len(script)-1)
-    result = {"script_content" : script[randomNumber].script_content, "author":script[randomNumber].author}
+    randomNumber = random.randint(0, len(script) - 1)
+    result = {
+        "script_content": script[randomNumber].script_content,
+        "author": script[randomNumber].author,
+    }
     return (
         {"response": "명언이 하나도 없는데요"}
         if script == None
@@ -75,7 +84,9 @@ def get_all_script(db: Session = Depends(get_db)):
 
 @app.get("/script/{script_id}")  # 특정 명언 조회
 def get_script(script_id: int, db: Session = Depends(get_db)):
-    script = db.query(models.script).filter(models.script.script_id == script_id).first()
+    script = (
+        db.query(models.script).filter(models.script.script_id == script_id).first()
+    )
     return (
         {"response": "명언이 없는데요"}
         if script == None
@@ -83,15 +94,10 @@ def get_script(script_id: int, db: Session = Depends(get_db)):
     )
 
 
-@app.post("/script")  # 게시글 작성
+@app.post("/script")  # 명언 작성
 async def post_board(body: schemas.script, db: Session = Depends(get_db)):
-    scriptData = models.script(
-        script_content=body.script_content,
-        author=body.author
-    )
-    db.add(scriptData)
-    db.commit()
-    db.refresh(scriptData)
+    scriptData = models.script(script_content=body.script_content, author=body.author)
+    post_db(db, scriptData)
     return {"response": "추가 완료", "Data": scriptData}
 
 
@@ -103,9 +109,7 @@ async def post_board(body: schemas.board, db: Session = Depends(get_db)):
         board_nickname=body.board_nickname,
         user_id=body.user_id,
     )
-    db.add(boardData)
-    db.commit()
-    db.refresh(boardData)
+    post_db(db, boardData)
     return {"response": "전송 완료", "Data": boardData}
 
 
@@ -117,9 +121,9 @@ async def upload_photo(file: UploadFile, db: Session = Depends(get_db)):
     with open(os.path.join(UPLOAD_DIR, href), "wb") as fp:
         fp.write(content)  # 서버 로컬에 이미지 저장 (쓰기)
         photoData = models.photos(href=href, board_id=1)
-        db.add(photoData)  # <models.photos object at 0x0000021B035C68E0>
-        db.commit()
-        db.refresh(photoData)
+
+    post_db(db, photoData)
+
     return photoData
 
 
