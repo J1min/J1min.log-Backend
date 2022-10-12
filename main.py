@@ -39,7 +39,7 @@ def get_db():
 def get_user(user_id: int, db: Session = Depends(get_db)):
     users = db.query(models.info).filter(models.info.user_id == user_id).first()
     return (
-        {"response": "유저가 없어요"}
+        {"response": "유저가 없는데요"}
         if users == None
         else {"response": "유저가 있어요", "userData": users}
     )
@@ -55,6 +55,34 @@ def get_board(board_id: int, db: Session = Depends(get_db)):
     )
 
 
+@app.get("/script/all")  
+def get_all_script(db: Session = Depends(get_db)):
+    script = db.query(models.script).all()
+    return script
+
+
+@app.get("/script/random")  
+def get_all_script(db: Session = Depends(get_db)):
+    script = db.query(models.script).all()
+    return script
+
+
+@app.get("/script/{script_id}")  # 특정 명언 조회
+def get_script(script_id: int, db: Session = Depends(get_db)):
+    script = db.query(models.script).filter(models.script.script_id == script_id).first()
+    return (
+        {"response": "명언이 없는데요"}
+        if script == None
+        else {"response": "명언이 있어요", "scriptData": script}
+    )
+
+
+
+# @app.get("/")
+# def main(db: Session = Depends(get_db)):
+#     users = db.query(models.info).all()
+#     return users
+
 @app.post("/script")  # 게시글 작성
 async def post_board(body: schemas.script, db: Session = Depends(get_db)):
     scriptData = models.script(
@@ -65,6 +93,7 @@ async def post_board(body: schemas.script, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(scriptData)
     return {"response": "추가 완료", "Data": scriptData}
+
 
 @app.post("/write")  # 게시글 작성
 async def post_board(body: schemas.board, db: Session = Depends(get_db)):
