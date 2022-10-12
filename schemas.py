@@ -4,7 +4,6 @@ from pydantic import BaseModel
 
 
 class info(BaseModel):
-    user_id: int
     nickname: str
     blog: str
     github: str
@@ -21,7 +20,6 @@ class board(BaseModel):
 
 
 class comments(BaseModel):
-    comment_id: int
     board_id: int
     created_at: str
     content: str
@@ -32,7 +30,6 @@ class comments(BaseModel):
 
 
 class contact(BaseModel):
-    contact_id: int
     phone_number: str
     phone_number: str
     user_id: int
@@ -42,7 +39,6 @@ class contact(BaseModel):
 
 
 class prizes(BaseModel):
-    prize_id: int
     prize: str
     user_id: int
 
@@ -51,7 +47,6 @@ class prizes(BaseModel):
 
 
 class careers(BaseModel):
-    careers_id: int
     careers_name: str
     started_at: str
     ended_at: str
@@ -62,7 +57,6 @@ class careers(BaseModel):
 
 
 class leads(BaseModel):
-    lead_id: int
     lead_name: str
     started_at: str
     ended_at: str
@@ -73,7 +67,6 @@ class leads(BaseModel):
 
 
 class projects(BaseModel):
-    project_id: int
     project_name: str
     project_img: str
     project_content: str
@@ -84,7 +77,6 @@ class projects(BaseModel):
 
 
 class certificate(BaseModel):
-    certificate_id: int
     certificate_name: str
     got_at: str
     user_id: int
@@ -94,7 +86,6 @@ class certificate(BaseModel):
 
 
 class skills(BaseModel):
-    skill_id: int
     skill_name: str
     proficiency: int
     user_id: int
@@ -104,19 +95,17 @@ class skills(BaseModel):
 
 
 class photos(BaseModel):
-    photo_id: int
     href: str
     board_id: int
 
     class Config:
-        orm_mode = True
+        orm_mode : True
 
 
 class script(BaseModel):
-    script_id = int
-    script_content = str
-    author = str
+    script_content : str
+    author : str
 
     class Config:
-        orm_mode = True
+        orm_mode : True
 

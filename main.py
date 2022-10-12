@@ -4,7 +4,7 @@ from fastapi.params import Depends
 from sqlalchemy.orm import Session
 from fastapi.responses import FileResponse
 
-import os, uuid, json
+import os, uuid, json, random
 
 import models, schemas
 from database import SessionLocal, engine
@@ -39,7 +39,7 @@ def get_db():
 def get_user(user_id: int, db: Session = Depends(get_db)):
     users = db.query(models.info).filter(models.info.user_id == user_id).first()
     return (
-        {"response": "유저가 없어요"}
+        {"response": "유저가 없는데요"}
         if users == None
         else {"response": "유저가 있어요", "userData": users}
     )
@@ -55,12 +55,48 @@ def get_board(board_id: int, db: Session = Depends(get_db)):
     )
 
 
-@app.post("/write/")  # 게시글 작성
+@app.get("/script/all")  
+def get_all_script(db: Session = Depends(get_db)):
+    script = db.query(models.script).all()
+    return script
+
+
+@app.get("/script/random")  
+def get_all_script(db: Session = Depends(get_db)):
+    script = db.query(models.script).all()
+    randomNumber = random.randint(0, len(script)-1)
+    result = {"script_content" : script[randomNumber].script_content, "author":script[randomNumber].author}
+    return (
+        {"response": "명언이 하나도 없는데요"}
+        if script == None
+        else {"response": "명언이 있어요", "scriptData": result}
+    )
+
+
+@app.get("/script/{script_id}")  # 특정 명언 조회
+def get_script(script_id: int, db: Session = Depends(get_db)):
+    script = db.query(models.script).filter(models.script.script_id == script_id).first()
+    return (
+        {"response": "명언이 없는데요"}
+        if script == None
+        else {"response": "명언이 있어요", "scriptData": script}
+    )
+
+
+@app.post("/script")  # 게시글 작성
+async def post_board(body: schemas.script, db: Session = Depends(get_db)):
+    scriptData = models.script(
+        script_content=body.script_content,
+        author=body.author
+    )
+    db.add(scriptData)
+    db.commit()
+    db.refresh(scriptData)
+    return {"response": "추가 완료", "Data": scriptData}
+
+
+@app.post("/write")  # 게시글 작성
 async def post_board(body: schemas.board, db: Session = Depends(get_db)):
-    print(body)
-    print(body)
-    print(body)
-    print(body)
     boardData = models.board(
         content=body.content,
         created_at=body.created_at,
