@@ -4,7 +4,7 @@ from fastapi.params import Depends
 from sqlalchemy.orm import Session
 from fastapi.responses import FileResponse
 
-import os, uuid, json
+import os, uuid, json, random
 
 import models, schemas
 from database import SessionLocal, engine
@@ -64,7 +64,13 @@ def get_all_script(db: Session = Depends(get_db)):
 @app.get("/script/random")  
 def get_all_script(db: Session = Depends(get_db)):
     script = db.query(models.script).all()
-    return script
+    randomNumber = random.randint(0, len(script)-1)
+    result = {"script_content" : script[randomNumber].script_content, "author":script[randomNumber].author}
+    return (
+        {"response": "명언이 하나도 없는데요"}
+        if script == None
+        else {"response": "명언이 있어요", "scriptData": result}
+    )
 
 
 @app.get("/script/{script_id}")  # 특정 명언 조회
@@ -76,12 +82,6 @@ def get_script(script_id: int, db: Session = Depends(get_db)):
         else {"response": "명언이 있어요", "scriptData": script}
     )
 
-
-
-# @app.get("/")
-# def main(db: Session = Depends(get_db)):
-#     users = db.query(models.info).all()
-#     return users
 
 @app.post("/script")  # 게시글 작성
 async def post_board(body: schemas.script, db: Session = Depends(get_db)):
