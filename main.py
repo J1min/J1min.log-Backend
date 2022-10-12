@@ -38,10 +38,11 @@ def get_db():
 
 @app.get("/user/{user_id}")  # 특정 유저 조회
 def main(user_id: int, db: Session = Depends(get_db)):
-    userNoneError = {"response": "유저가 없어요"}
     users = db.query(models.info).filter(models.info.user_id == user_id).first()
     return (
-        userNoneError if users == None else {"response": "유저가 있어요", "UserData": users}
+        {"response": "유저가 없어요"}
+        if users == None
+        else {"response": "유저가 있어요", "UserData": users}
     )
 
 
