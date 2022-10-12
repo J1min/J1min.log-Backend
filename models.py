@@ -4,7 +4,7 @@ from database import Base
 
 class info(Base):
     __tablename__ = "info"
-    user_id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, primary_key=True, autoincrement=True)
     nickname = Column(String(30))
     blog = Column(String(255))
     github = Column(String(255))
@@ -91,3 +91,11 @@ class photos(Base):
     photo_id = Column(Integer, primary_key=True, autoincrement=True)
     href = Column(String(255))
     board_id = Column(Integer, ForeignKey("board.board_id"))
+
+
+class script(Base):
+    __tablename__ = "script"
+    script_id = Column(Integer, primary_key=True, autoincrement=True)
+    script_content = Column(String(500))
+    author = Column(String(100))
+

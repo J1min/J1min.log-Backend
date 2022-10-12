@@ -55,12 +55,30 @@ def get_board(board_id: int, db: Session = Depends(get_db)):
     )
 
 
-@app.post("/write/")  # 게시글 작성
+@app.post("/script")  # 게시글 작성
+async def post_board(body: schemas.script, db: Session = Depends(get_db)):
+    print(body)
+    print(body)
+    print(body)
+    print(body)
+    print(body)
+    scriptData = models.script(
+        script_content=body.script_content,
+        author=body.author
+    )
+    print(scriptData)
+    print(scriptData)
+    print(scriptData)
+    print(scriptData)
+    print(scriptData)
+    print(scriptData)
+    db.add(scriptData)
+    db.commit()
+    db.refresh(scriptData)
+    return {"response": "추가 완료", "Data": scriptData}
+
+@app.post("/write")  # 게시글 작성
 async def post_board(body: schemas.board, db: Session = Depends(get_db)):
-    print(body)
-    print(body)
-    print(body)
-    print(body)
     boardData = models.board(
         content=body.content,
         created_at=body.created_at,
