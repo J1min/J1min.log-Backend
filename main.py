@@ -1,12 +1,10 @@
-from fastapi import FastAPI, UploadFile
+from fastapi import FastAPI, UploadFile, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.params import Depends
 from sqlalchemy.orm import Session
 from fastapi.responses import FileResponse
 
-import os
-import uuid
-import json
+import os, uuid, json
 
 import models, schemas
 from database import SessionLocal, engine
@@ -15,6 +13,7 @@ models.Base.metadata.create_all(bind=engine)
 
 
 app = FastAPI()
+
 origins = [
     "http://localhost:3000",
 ]
@@ -37,13 +36,41 @@ def get_db():
 
 
 @app.get("/user/{user_id}")  # 특정 유저 조회
-def main(user_id: int, db: Session = Depends(get_db)):
+def get_user(user_id: int, db: Session = Depends(get_db)):
     users = db.query(models.info).filter(models.info.user_id == user_id).first()
     return (
         {"response": "유저가 없어요"}
         if users == None
-        else {"response": "유저가 있어요", "UserData": users}
+        else {"response": "유저가 있어요", "userData": users}
     )
+
+
+@app.get("/board/{board_id}")  # 특정 게시글 조회
+def get_board(board_id: int, db: Session = Depends(get_db)):
+    board = db.query(models.board).filter(models.board.board_id == board_id).first()
+    return (
+        {"response": "게시글이 없는데요"}
+        if board == None
+        else {"response": "게시글이 있어요", "BoardData": board}
+    )
+
+
+@app.post("/write/")  # 게시글 작성
+async def post_board(body: schemas.board, db: Session = Depends(get_db)):
+    print(body)
+    print(body)
+    print(body)
+    print(body)
+    boardData = models.board(
+        content=body.content,
+        created_at=body.created_at,
+        board_nickname=body.board_nickname,
+        user_id=body.user_id,
+    )
+    db.add(boardData)
+    db.commit()
+    db.refresh(boardData)
+    return {"response": "전송 완료", "Data": boardData}
 
 
 @app.post("/photo")  # 사진 post
@@ -54,7 +81,7 @@ async def upload_photo(file: UploadFile, db: Session = Depends(get_db)):
     with open(os.path.join(UPLOAD_DIR, href), "wb") as fp:
         fp.write(content)  # 서버 로컬에 이미지 저장 (쓰기)
         photoData = models.photos(href=href, board_id=1)
-        db.add(photoData)
+        db.add(photoData)  # <models.photos object at 0x0000021B035C68E0>
         db.commit()
         db.refresh(photoData)
     return photoData
