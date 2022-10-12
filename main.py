@@ -53,7 +53,7 @@ async def upload_photo(file: UploadFile, db: Session = Depends(get_db)):
     href = f"{str(uuid.uuid4())}.jpg"  # uuid로 유니크한 파일명으로 변경
     with open(os.path.join(UPLOAD_DIR, href), "wb") as fp:
         fp.write(content)  # 서버 로컬에 이미지 저장 (쓰기)
-        photoData = models.photos(photo_id=4, href=href, board_id=1)
+        photoData = models.photos(href=href, board_id=1)
         db.add(photoData)
         db.commit()
         db.refresh(photoData)

@@ -1,3 +1,4 @@
 .env
 database.sql
 secret.json
+/photo
