@@ -41,7 +41,7 @@ def get_user(user_id: int, db: Session = Depends(get_db)):
     return (
         {"response": "유저가 없어요"}
         if users == None
-        else {"response": "유저가 있어요", "UserData": users}
+        else {"response": "유저가 있어요", "userData": users}
     )
 
 
@@ -56,12 +56,12 @@ def get_board(board_id: int, db: Session = Depends(get_db)):
 
 
 @app.post("/write/")  # 게시글 작성
-async def post_board(body: schemas.write, db: Session = Depends(get_db)):
+async def post_board(body: schemas.board, db: Session = Depends(get_db)):
     print(body)
     print(body)
     print(body)
     print(body)
-    boardData = models.write(
+    boardData = models.board(
         content=body.content,
         created_at=body.created_at,
         board_nickname=body.board_nickname,

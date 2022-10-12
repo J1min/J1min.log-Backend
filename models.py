@@ -10,7 +10,7 @@ class info(Base):
     github = Column(String(255))
 
 
-class write(Base):
+class board(Base):
     __tablename__ = "board"
     board_id = Column(Integer, primary_key=True, autoincrement=True)
     content = Column(String(5000))
