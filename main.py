@@ -121,9 +121,7 @@ async def upload_photo(file: UploadFile, db: Session = Depends(get_db)):
     with open(os.path.join(UPLOAD_DIR, href), "wb") as fp:
         fp.write(content)  # 서버 로컬에 이미지 저장 (쓰기)
         photoData = models.photos(href=href, board_id=1)
-
     post_db(db, photoData)
-
     return photoData
 
 
