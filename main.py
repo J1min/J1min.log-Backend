@@ -24,8 +24,6 @@ origins = [
     
 ]
 
-print(os.environ.get('FRONT_BASE_URL'))
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -72,7 +70,11 @@ def get_board(board_id: int, db: Session = Depends(get_db)):
 @app.get("/script/all")
 def get_all_script(db: Session = Depends(get_db)):
     script = db.query(model.script).all()
-    return script
+    return (
+        {"response": "명언이 하나도 없는데요"}
+        if script == None
+        else {"response": "명언이 있어요", "scriptData": result}
+    )
 
 
 @app.get("/script/random")
@@ -105,9 +107,11 @@ def get_script(script_id: int, db: Session = Depends(get_db)):
 @app.post("/script")  # 명언 작성
 async def post_board(body: schemas.script, db: Session = Depends(get_db)):
     scriptData = model.script(script_content=body.script_content, author=body.author)
-    post_db(db, scriptData)
-    return {"response": "추가 완료", "Data": scriptData}
-
+    try:
+        post_db(db, scriptData)
+        return {"response": "추가 완료", "Data": scriptData}
+    except:
+        return {'response': "추가 실패"}
 
 @app.post("/write")  # 게시글 작성
 async def post_board(body: schemas.board, db: Session = Depends(get_db)):
@@ -117,9 +121,11 @@ async def post_board(body: schemas.board, db: Session = Depends(get_db)):
         board_nickname=body.board_nickname,
         user_id=body.user_id,
     )
-    post_db(db, boardData)
-    return {"response": "전송 완료", "Data": boardData}
-
+    try:
+        post_db(db, boardData)
+        return {"response": "전송 완료", "Data": boardData}
+    except:
+        return {"response": "전송이 안됨"}
 
 @app.post("/photo")  # 사진 post
 async def upload_photo(file: UploadFile, db: Session = Depends(get_db)):
@@ -129,14 +135,21 @@ async def upload_photo(file: UploadFile, db: Session = Depends(get_db)):
     with open(os.path.join(UPLOAD_DIR, href), "wb") as fp:
         fp.write(content)  # 서버 로컬에 이미지 저장 (쓰기)
         photoData = model.photos(href=href, board_id=1)
-    post_db(db, photoData)
-    return photoData
+    try:
+        post_db(db, photoData)
+        return photoData
+    except:
+        return {"response" : '보드가 없는데요 뭔가이상'}
 
 
 @app.get("/get/photo/{photo_id}")  # 사진의 PK를 입력하면 해당 사진 return
 async def download_photo(photo_id: int, db: Session = Depends(get_db)):
     UPLOAD_DIR = "./photo/"  # 사진 폴더 안에 저장
-    find_photo = (
-        db.query(model.photos).filter(model.photos.photo_id == photo_id).first()
-    )
-    return FileResponse(UPLOAD_DIR + find_photo.href)
+    try:
+        find_photo = (
+            db.query(model.photos).filter(model.photos.photo_id == photo_id).first()
+        )
+        return FileResponse(UPLOAD_DIR + find_photo.href)
+    except:
+        return {'response': "사진이 없어요"}
+    
