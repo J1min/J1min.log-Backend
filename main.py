@@ -17,10 +17,13 @@ model.Base.metadata.create_all(bind=engine)
 
 
 app = FastAPI()
+load_dotenv()
 
 origins = [
     os.environ.get('FRONT_BASE_URL')
 ]
+
+print(os.environ.get('FRONT_BASE_URL'))
 
 app.add_middleware(
     CORSMiddleware,
