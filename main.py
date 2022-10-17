@@ -20,7 +20,9 @@ app = FastAPI()
 load_dotenv()
 
 origins = [
-    os.environ.get('FRONT_BASE_URL')
+    os.environ.get('FRONT_BASE_URL'),
+    os.environ.get('FRONT_DEV_URL'),
+    
 ]
 
 print(os.environ.get('FRONT_BASE_URL'))
