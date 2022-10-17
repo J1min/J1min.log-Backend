@@ -1,6 +1,5 @@
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
-from database import Base
-
+from database import Base 
 
 class info(Base):
     __tablename__ = "info"

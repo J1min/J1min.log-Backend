@@ -6,14 +6,13 @@ from fastapi.responses import FileResponse
 
 import os, uuid, json, random
 
-from interface import model 
-from interface import schemas
+from interface import model, schemas
 
-from database import SessionLocal, engine
+import database
 from dotenv import load_dotenv
 
 
-model.Base.metadata.create_all(bind=engine)
+model.Base.metadata.create_all(bind=database.engine)
 
 
 app = FastAPI()
@@ -38,7 +37,7 @@ app.add_middleware(
 
 def get_db():
     try:
-        db = SessionLocal()
+        db = database.SessionLocal()
         yield db
     finally:
         db.close()
