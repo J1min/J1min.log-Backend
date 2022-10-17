@@ -6,16 +6,20 @@ from fastapi.responses import FileResponse
 
 import os, uuid, json, random
 
-import models, schemas
-from database import SessionLocal, engine
+from interface import model 
+from interface import schemas
 
-models.Base.metadata.create_all(bind=engine)
+from database import SessionLocal, engine
+from dotenv import load_dotenv
+
+
+model.Base.metadata.create_all(bind=engine)
 
 
 app = FastAPI()
 
 origins = [
-    "http://localhost:3000",
+    os.environ.get('FRONT_BASE_URL')
 ]
 
 app.add_middleware(
@@ -43,7 +47,7 @@ def post_db(db, data):
 
 @app.get("/user/{user_id}")  # 특정 유저 조회
 def get_user(user_id: int, db: Session = Depends(get_db)):
-    users = db.query(models.info).filter(models.info.user_id == user_id).first()
+    users = db.query(model.info).filter(model.info.user_id == user_id).first()
     return (
         {"response": "유저가 없는데요"}
         if users == None
@@ -53,7 +57,7 @@ def get_user(user_id: int, db: Session = Depends(get_db)):
 
 @app.get("/board/{board_id}")  # 특정 게시글 조회
 def get_board(board_id: int, db: Session = Depends(get_db)):
-    board = db.query(models.board).filter(models.board.board_id == board_id).first()
+    board = db.query(model.board).filter(model.board.board_id == board_id).first()
     return (
         {"response": "게시글이 없는데요"}
         if board == None
@@ -63,13 +67,13 @@ def get_board(board_id: int, db: Session = Depends(get_db)):
 
 @app.get("/script/all")
 def get_all_script(db: Session = Depends(get_db)):
-    script = db.query(models.script).all()
+    script = db.query(model.script).all()
     return script
 
 
 @app.get("/script/random")
 def get_all_script(db: Session = Depends(get_db)):
-    script = db.query(models.script).all()
+    script = db.query(model.script).all()
     randomNumber = random.randint(0, len(script) - 1)
     result = {
         "script_content": script[randomNumber].script_content,
@@ -85,7 +89,7 @@ def get_all_script(db: Session = Depends(get_db)):
 @app.get("/script/{script_id}")  # 특정 명언 조회
 def get_script(script_id: int, db: Session = Depends(get_db)):
     script = (
-        db.query(models.script).filter(models.script.script_id == script_id).first()
+        db.query(model.script).filter(model.script.script_id == script_id).first()
     )
     return (
         {"response": "명언이 없는데요"}
@@ -96,14 +100,14 @@ def get_script(script_id: int, db: Session = Depends(get_db)):
 
 @app.post("/script")  # 명언 작성
 async def post_board(body: schemas.script, db: Session = Depends(get_db)):
-    scriptData = models.script(script_content=body.script_content, author=body.author)
+    scriptData = model.script(script_content=body.script_content, author=body.author)
     post_db(db, scriptData)
     return {"response": "추가 완료", "Data": scriptData}
 
 
 @app.post("/write")  # 게시글 작성
 async def post_board(body: schemas.board, db: Session = Depends(get_db)):
-    boardData = models.board(
+    boardData = model.board(
         content=body.content,
         created_at=body.created_at,
         board_nickname=body.board_nickname,
@@ -120,7 +124,7 @@ async def upload_photo(file: UploadFile, db: Session = Depends(get_db)):
     href = f"{str(uuid.uuid4())}.jpg"  # uuid로 유니크한 파일명으로 변경
     with open(os.path.join(UPLOAD_DIR, href), "wb") as fp:
         fp.write(content)  # 서버 로컬에 이미지 저장 (쓰기)
-        photoData = models.photos(href=href, board_id=1)
+        photoData = model.photos(href=href, board_id=1)
     post_db(db, photoData)
     return photoData
 
@@ -129,6 +133,6 @@ async def upload_photo(file: UploadFile, db: Session = Depends(get_db)):
 async def download_photo(photo_id: int, db: Session = Depends(get_db)):
     UPLOAD_DIR = "./photo/"  # 사진 폴더 안에 저장
     find_photo = (
-        db.query(models.photos).filter(models.photos.photo_id == photo_id).first()
+        db.query(model.photos).filter(model.photos.photo_id == photo_id).first()
     )
     return FileResponse(UPLOAD_DIR + find_photo.href)
