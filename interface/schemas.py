@@ -5,7 +5,7 @@ from pydantic import BaseModel
 
 class info(BaseModel):
     nickname: str
-    blog: str
+    description: str
     github: str
 
     class Config:

@@ -5,7 +5,7 @@ class info(Base):
     __tablename__ = "info"
     user_id = Column(Integer, primary_key=True, autoincrement=True)
     nickname = Column(String(30))
-    blog = Column(String(255))
+    description = Column(String(255))
     github = Column(String(255))
 
 

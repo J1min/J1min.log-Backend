@@ -5,3 +5,4 @@ secret.json
 /__pycache__
 /cli
 /private
+*.pyc
