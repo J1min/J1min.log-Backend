@@ -56,6 +56,16 @@ def get_user(user_id: int, db: Session = Depends(get_db)):
     )
 
 
+@app.get("/board/all")  # 전체 게시글 조회
+def get_all_board(db: Session = Depends(get_db)):
+    board = db.query(model.board).all()
+    return (
+        {"response": "게시글이 하나도 없는데요"}
+        if board == None
+        else {"response": "게시글이 있어요", "boardData": board}
+    )
+
+
 @app.get("/board/{board_id}")  # 특정 게시글 조회
 def get_board(board_id: int, db: Session = Depends(get_db)):
     board = db.query(model.board).filter(model.board.board_id == board_id).first()
@@ -116,7 +126,7 @@ async def post_board(body: schemas.board, db: Session = Depends(get_db)):
     boardData = model.board(
         content=body.content,
         created_at=body.created_at,
-        board_nickname=body.board_nickname,
+        board_title=body.board_title,
         user_id=body.user_id,
     )
     try:
@@ -134,7 +144,7 @@ async def upload_photo(file: UploadFile, db: Session = Depends(get_db)):
     with open(os.path.join(UPLOAD_DIR, href), "wb") as fp:
         fp.write(content)  # 서버 로컬에 이미지 저장 (쓰기)
         photoData = model.photos(href=href, board_id=1)
-        
+
     try:
         post_db(db, photoData)
         return photoData
