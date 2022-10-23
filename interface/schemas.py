@@ -16,7 +16,7 @@ class board(BaseModel):
     user_id: int
     created_at: str
     content: str
-    board_nickname: str
+    board_title: str
 
 
 class comments(BaseModel):

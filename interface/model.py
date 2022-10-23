@@ -14,7 +14,7 @@ class board(Base):
     board_id = Column(Integer, primary_key=True, autoincrement=True)
     content = Column(String(5000))
     created_at = Column(String(30))
-    board_nickname = Column(String(255))
+    board_title = Column(String(255))
     user_id = Column(Integer, ForeignKey("info.user_id"))
 
 
