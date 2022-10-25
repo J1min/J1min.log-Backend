@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.params import Depends
 from sqlalchemy.orm import Session
 from fastapi.responses import FileResponse
+import boto3
 
 import os, uuid, json, random
 
@@ -44,6 +45,11 @@ def post_db(db, data):
     db.add(data)
     db.commit()
     db.refresh(data)
+
+
+@app.get("/")
+def get_user():
+    return {"response": "연결 성공"}
 
 
 @app.get("/user/{user_id}")  # 특정 유저 조회
@@ -136,15 +142,18 @@ async def post_board(body: schemas.board, db: Session = Depends(get_db)):
         return {"response": "전송이 안됨"}
 
 
+def upload_file(fileName, file):
+    s3 = boto3.resource("s3")
+    s3.Bucket(os.environ.get("AWS_BUCKET_NAME")).put_object(Key=fileName, Body=file, ContentType="image/jpeg")
+    return
+
+
 @app.post("/photo")  # 사진 post
 async def upload_photo(file: UploadFile, db: Session = Depends(get_db)):
-    UPLOAD_DIR = "./photo"
     content = await file.read()
     href = f"{str(uuid.uuid4())}.jpeg"  # uuid로 유니크한 파일명으로 변경
-    with open(os.path.join(UPLOAD_DIR, href), "wb") as fp:
-        fp.write(content)  # 서버 로컬에 이미지 저장 (쓰기)
-        photoData = model.photos(href=href, board_id=1)
-
+    upload_file(href, content)
+    photoData = model.photos(href=href, board_id=1)
     try:
         post_db(db, photoData)
         return photoData
