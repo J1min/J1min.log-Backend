@@ -56,7 +56,7 @@ def get_user():
 def get_user(user_id: int, db: Session = Depends(get_db)):
     users = db.query(model.info).filter(model.info.user_id == user_id).first()
     return (
-        {"response": "유저가 없는데요"}
+        {"code": 404, "response": "유저가 없는데요"}
         if users == None
         else {"response": "유저가 있어요", "userData": users}
     )
@@ -66,7 +66,7 @@ def get_user(user_id: int, db: Session = Depends(get_db)):
 def get_all_board(db: Session = Depends(get_db)):
     board = db.query(model.board).all()
     return (
-        {"response": "게시글이 하나도 없는데요"}
+        {"code": 404, "response": "게시글이 하나도 없는데요"}
         if board == None
         else {"response": "게시글이 있어요", "boardData": board}
     )
@@ -76,7 +76,7 @@ def get_all_board(db: Session = Depends(get_db)):
 def get_board(board_id: int, db: Session = Depends(get_db)):
     board = db.query(model.board).filter(model.board.board_id == board_id).first()
     return (
-        {"response": "게시글이 없는데요"}
+        {"code": 404, "response": "게시글이 없는데요"}
         if board == None
         else {"response": "게시글이 있어요", "boardData": board}
     )
@@ -86,7 +86,7 @@ def get_board(board_id: int, db: Session = Depends(get_db)):
 def get_all_script(db: Session = Depends(get_db)):
     script = db.query(model.script).all()
     return (
-        {"response": "명언이 하나도 없는데요"}
+        {"code": 404, "response": "명언이 하나도 없는데요"}
         if script == None
         else {"response": "명언이 있어요", "scriptData": result}
     )
@@ -101,7 +101,7 @@ def get_all_script(db: Session = Depends(get_db)):
         "author": script[randomNumber].author,
     }
     return (
-        {"response": "명언이 하나도 없는데요"}
+        {"code": 404, "response": "명언이 하나도 없는데요"}
         if script == None
         else {"response": "명언이 있어요", "scriptData": result}
     )
@@ -111,7 +111,7 @@ def get_all_script(db: Session = Depends(get_db)):
 def get_script(script_id: int, db: Session = Depends(get_db)):
     script = db.query(model.script).filter(model.script.script_id == script_id).first()
     return (
-        {"response": "명언이 없는데요"}
+        {"code": 404, "response": "명언이 없는데요"}
         if script == None
         else {"response": "명언이 있어요", "scriptData": script}
     )
@@ -124,7 +124,7 @@ async def post_board(body: schemas.script, db: Session = Depends(get_db)):
         post_db(db, scriptData)
         return {"response": "추가 완료", "Data": scriptData}
     except:
-        return {"response": "추가 실패"}
+        return {"code": 404, "response": "추가 실패"}
 
 
 @app.post("/write")  # 게시글 작성
@@ -139,12 +139,14 @@ async def post_board(body: schemas.board, db: Session = Depends(get_db)):
         post_db(db, boardData)
         return {"response": "전송 완료", "Data": boardData}
     except:
-        return {"response": "전송이 안됨"}
+        return {"code": 404, "response": "전송이 안됨"}
 
 
 def upload_file(fileName, file):
     s3 = boto3.resource("s3")
-    s3.Bucket(os.environ.get("AWS_BUCKET_NAME")).put_object(Key=fileName, Body=file, ContentType="image/jpeg")
+    s3.Bucket(os.environ.get("AWS_BUCKET_NAME")).put_object(
+        Key=fileName, Body=file, ContentType="image/jpeg"
+    )
     return
 
 
@@ -158,16 +160,4 @@ async def upload_photo(file: UploadFile, db: Session = Depends(get_db)):
         post_db(db, photoData)
         return photoData
     except:
-        return {"response": "보드가 없는데요 뭔가이상"}
-
-
-@app.get("/get/photo/{photo_id}")  # 사진의 PK를 입력하면 해당 사진 return
-async def download_photo(photo_id: int, db: Session = Depends(get_db)):
-    UPLOAD_DIR = "./photo/"  # 사진 폴더 안에 저장
-    try:
-        find_photo = (
-            db.query(model.photos).filter(model.photos.photo_id == photo_id).first()
-        )
-        return FileResponse(UPLOAD_DIR + find_photo.href)
-    except:
-        return {"response": "사진이 없어요"}
+        return {"code": 404, "response": "보드가 없는데요 뭔가이상"}
