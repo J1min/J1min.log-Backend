@@ -49,7 +49,7 @@ def post_db(db, data):
 
 @app.get("/")
 def get_user():
-    return {"response": "연결 성공"}
+    return {"code": 200, "response": "연결 성공"}
 
 
 @app.get("/user/{user_id}")  # 특정 유저 조회
@@ -58,7 +58,7 @@ def get_user(user_id: int, db: Session = Depends(get_db)):
     return (
         {"code": 404, "response": "유저가 없는데요"}
         if users == None
-        else {"response": "유저가 있어요", "userData": users}
+        else {"code": 200, "response": "유저가 있어요", "userData": users}
     )
 
 
@@ -68,7 +68,7 @@ def get_all_board(db: Session = Depends(get_db)):
     return (
         {"code": 404, "response": "게시글이 하나도 없는데요"}
         if board == None
-        else {"response": "게시글이 있어요", "boardData": board}
+        else {"code": 200, "response": "게시글이 있어요", "boardData": board}
     )
 
 
@@ -78,7 +78,7 @@ def get_board(board_id: int, db: Session = Depends(get_db)):
     return (
         {"code": 404, "response": "게시글이 없는데요"}
         if board == None
-        else {"response": "게시글이 있어요", "boardData": board}
+        else {"code": 200, "response": "게시글이 있어요", "boardData": board}
     )
 
 
@@ -88,7 +88,7 @@ def get_all_script(db: Session = Depends(get_db)):
     return (
         {"code": 404, "response": "명언이 하나도 없는데요"}
         if script == None
-        else {"response": "명언이 있어요", "scriptData": result}
+        else {"code": 200, "response": "명언이 있어요", "scriptData": result}
     )
 
 
@@ -103,7 +103,7 @@ def get_all_script(db: Session = Depends(get_db)):
     return (
         {"code": 404, "response": "명언이 하나도 없는데요"}
         if script == None
-        else {"response": "명언이 있어요", "scriptData": result}
+        else {"code": 200, "response": "명언이 있어요", "scriptData": result}
     )
 
 
@@ -113,7 +113,7 @@ def get_script(script_id: int, db: Session = Depends(get_db)):
     return (
         {"code": 404, "response": "명언이 없는데요"}
         if script == None
-        else {"response": "명언이 있어요", "scriptData": script}
+        else {"code": 200, "response": "명언이 있어요", "scriptData": script}
     )
 
 
@@ -122,7 +122,7 @@ async def post_board(body: schemas.script, db: Session = Depends(get_db)):
     scriptData = model.script(script_content=body.script_content, author=body.author)
     try:
         post_db(db, scriptData)
-        return {"response": "추가 완료", "Data": scriptData}
+        return {"code": 200, "response": "추가 완료", "Data": scriptData}
     except:
         return {"code": 404, "response": "추가 실패"}
 
@@ -137,7 +137,7 @@ async def post_board(body: schemas.board, db: Session = Depends(get_db)):
     )
     try:
         post_db(db, boardData)
-        return {"response": "전송 완료", "Data": boardData}
+        return {"code": 200, "response": "전송 완료", "Data": boardData}
     except:
         return {"code": 404, "response": "전송이 안됨"}
 
