@@ -1,14 +1,15 @@
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-import json
+
+import json, os
+
+from dotenv import load_dotenv
 
 
-with open("./secret.json", "r") as f:
-    userData = json.load(f)
-
+load_dotenv()
 Base = declarative_base()
 
-DATABASE_URL = f"mysql+mysqlconnector://{userData['USERNAME']}:{userData['PASSWORD']}@{userData['HOSTNAME']}:{userData['PORT']}/{userData['DBNAME']}"
+DATABASE_URL = f"mysql+mysqlconnector://{os.environ.get('DBROOTUSERNAME')}:{os.environ.get('PASSWORD')}@{os.environ.get('HOSTNAME')}:{os.environ.get('PORT')}/{os.environ.get('DBNAME')}"
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
