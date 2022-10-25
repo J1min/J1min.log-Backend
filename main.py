@@ -137,7 +137,7 @@ async def post_board(body: schemas.board, db: Session = Depends(get_db)):
     )
     try:
         post_db(db, boardData)
-        return {"code": 200, "response": "전송 완료", "Data": boardData}
+        return {"code": 200, "response": "전송 완료", "boardData": boardData}
     except:
         return {"code": 404, "response": "전송이 안됨"}
 
