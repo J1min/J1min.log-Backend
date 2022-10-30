@@ -17,6 +17,8 @@ class board(BaseModel):
     created_at: str
     content: str
     board_title: str
+    description: str
+    thumbnail: str
 
 
 class comments(BaseModel):
@@ -99,13 +101,12 @@ class photos(BaseModel):
     board_id: int
 
     class Config:
-        orm_mode : True
+        orm_mode: True
 
 
 class script(BaseModel):
-    script_content : str
-    author : str
+    script_content: str
+    author: str
 
     class Config:
-        orm_mode : True
-
+        orm_mode: True

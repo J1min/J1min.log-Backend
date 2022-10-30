@@ -1,5 +1,6 @@
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
-from database import Base 
+from database import Base
+
 
 class info(Base):
     __tablename__ = "info"
@@ -12,9 +13,11 @@ class info(Base):
 class board(Base):
     __tablename__ = "board"
     board_id = Column(Integer, primary_key=True, autoincrement=True)
-    content = Column(String(5000))
+    content = Column(String(10000))
     created_at = Column(String(30))
     board_title = Column(String(255))
+    thumbnail = Column(String(100))
+    description = Column(String(255))
     user_id = Column(Integer, ForeignKey("info.user_id"))
 
 
@@ -97,4 +100,3 @@ class script(Base):
     script_id = Column(Integer, primary_key=True, autoincrement=True)
     script_content = Column(String(500))
     author = Column(String(100))
-

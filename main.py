@@ -60,7 +60,9 @@ def get_user(user_id: int, db: Session = Depends(get_db)):
 
 @app.get("/board/all")  # 전체 게시글 조회
 def get_all_board(db: Session = Depends(get_db)):
-    board = db.query(model.board).order_by(model.board.board_id.desc()).all() #.limit(5).all()
+    board = (
+        db.query(model.board).order_by(model.board.board_id.desc()).all()
+    )  # .limit(5).all()
     return {"code": 200, "response": "게시글이 있어요", "boardData": board}
 
 
@@ -113,6 +115,7 @@ def post_board(body: schemas.board, db: Session = Depends(get_db)):
         created_at=body.created_at,
         board_title=body.board_title,
         user_id=body.user_id,
+        thumbnail=body.thumbnail,
     )
     post_db(db, boardData)
     return {"code": 200, "response": "전송 완료", "boardData": boardData}
