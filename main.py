@@ -58,6 +58,21 @@ def get_user(user_id: int, db: Session = Depends(get_db)):
     return {"code": 200, "response": "유저가 있어요", "userData": users}
 
 
+@app.get("/user/profile/all")  # 특정 유저 조회
+def get_user(db: Session = Depends(get_db)):
+    contacts = {
+        "birthday": "05.10.27",
+        "school": "부산SW마이스터고등학교 재학 (2021.03. ~ 2024.02.)",
+    }
+    return {"code": 200, "response": "유저가 있어요", "userData": contacts}
+
+
+@app.get("/user/contact/all")  # 특정 유저 조회
+def get_user(db: Session = Depends(get_db)):
+    contacts = {"phone_number": "01041662421", "email": "aoiharu41@gmail.com"}
+    return {"code": 200, "response": "유저가 있어요", "userData": contacts}
+
+
 @app.get("/board/all")  # 전체 게시글 조회
 def get_all_board(db: Session = Depends(get_db)):
     board = (
