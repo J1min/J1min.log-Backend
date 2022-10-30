@@ -116,6 +116,7 @@ def post_board(body: schemas.board, db: Session = Depends(get_db)):
         board_title=body.board_title,
         user_id=body.user_id,
         thumbnail=body.thumbnail,
+        description=body.description,
     )
     post_db(db, boardData)
     return {"code": 200, "response": "전송 완료", "boardData": boardData}
