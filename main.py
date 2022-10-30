@@ -60,7 +60,7 @@ def get_user(user_id: int, db: Session = Depends(get_db)):
 
 @app.get("/board/all")  # 전체 게시글 조회
 def get_all_board(db: Session = Depends(get_db)):
-    board = db.query(model.board).all()
+    board = db.query(model.board).order_by(model.board.board_id.desc()).all() #.limit(5).all()
     return {"code": 200, "response": "게시글이 있어요", "boardData": board}
 
 
