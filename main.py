@@ -52,27 +52,6 @@ def get_user():
     return {"code": 200, "response": "연결 성공"}
 
 
-@app.get("/user/{user_id}")  # 특정 유저 조회
-def get_user(user_id: int, db: Session = Depends(get_db)):
-    users = db.query(model.info).filter(model.info.user_id == user_id).first()
-    return {"code": 200, "response": "유저가 있어요", "userData": users}
-
-
-@app.get("/user/profile/all")  # 특정 유저 조회
-def get_user(db: Session = Depends(get_db)):
-    contacts = {
-        "birthday": "05.10.27",
-        "school": "부산SW마이스터고등학교 재학 (2021.03. ~ 2024.02.)",
-    }
-    return {"code": 200, "response": "유저가 있어요", "userData": contacts}
-
-
-@app.get("/user/contact/all")  # 특정 유저 조회
-def get_user(db: Session = Depends(get_db)):
-    contacts = {"phone_number": "01041662421", "email": "aoiharu41@gmail.com"}
-    return {"code": 200, "response": "유저가 있어요", "userData": contacts}
-
-
 @app.get("/board/all")  # 전체 게시글 조회
 def get_all_board(db: Session = Depends(get_db)):
     board = (
@@ -108,12 +87,6 @@ def get_all_script(db: Session = Depends(get_db)):
 def get_script(script_id: int, db: Session = Depends(get_db)):
     script = db.query(model.script).filter(model.script.script_id == script_id).first()
     return {"code": 200, "response": "명언이 있어요", "scriptData": script}
-
-
-@app.get("/user/leads/all")  # leads 조회
-def get_leads(db: Session = Depends(get_db)):
-    userData = db.query(model.leads).all()
-    return {"code": 200, "response": "전송 완료", "userData": userData}
 
 
 @app.post("/script")  # 명언 작성
@@ -154,14 +127,3 @@ async def upload_photo(file: UploadFile, db: Session = Depends(get_db)):
     post_db(db, photoData)
     return photoData
 
-
-@app.post("/user/leads")  # 게시글 작성
-def post_leads(body: schemas.leads, db: Session = Depends(get_db)):
-    userData = model.leads(
-        lead_name=body.lead_name,
-        started_at=body.started_at,
-        ended_at=body.ended_at,
-        user_id=1,
-    )
-    post_db(db, userData)
-    return {"code": 200, "response": "전송 완료", "userData": userData}
