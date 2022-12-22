@@ -2,7 +2,7 @@
 database.sql
 secret.json
 /photo
-/__pycache__
+__pycache__
 /cli
 /private
 *.pyc
